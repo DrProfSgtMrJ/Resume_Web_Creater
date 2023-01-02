@@ -30,7 +30,7 @@ struct AppArgs {
 
     #[clap(short, long)]
     #[clap(default_value="debug")]
-    /// Level for log:  off, error, warn, info, debug, trace
+    /// Level for log: off, error, warn, info, debug, trace
     log_level: String,
 }
 
