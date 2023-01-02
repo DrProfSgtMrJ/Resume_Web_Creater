@@ -6,41 +6,36 @@ extern crate lazy_static;
 extern crate log;
 
 
-use std::ops::Deref;
 mod resume;
 mod reader;
-use clap::{Arg, Command};
+mod logger;
 
 use crate::resume::Resume;
 use crate::reader::ResumeReader;
+use crate::logger::ConfigLogger;
+
+use std::{ops::Deref, str::FromStr};
+use clap::{Parser};
+use log::{LevelFilter};
 
 
+
+#[derive(Parser, Default, Debug)]
+#[clap(author="Jade Dever Matthews", version, about="Generates a web page from a resume")]
 struct AppArgs {
-    resume: String,
-}
+    #[clap(short, long)]
+    #[clap(default_value="./resume_example.toml")]
+    /// Path to the resume config file
+    resume_config: String,
 
-fn make_app_args() -> AppArgs {
-    let matches = Command::new(clap::crate_name!())
-        .version(clap::crate_version!())
-        .author(clap::crate_authors!())
-        .about(clap::crate_description!())
-        .arg(
-            Arg::new("resume")
-                .short('r')
-                .long("resume")
-                .help("Path to resume file")
-                .default_value("./resume.toml")
-        )
-        .get_matches();
-
-    // Generate owned app arguments
-    AppArgs {
-        resume: String::from(matches.get_one::<String>("resume").expect("invalid resume value")),
-    }
+    #[clap(short, long)]
+    #[clap(default_value="debug")]
+    /// Level for log:  off, error, warn, info, debug, trace
+    log_level: String,
 }
 
 lazy_static! {
-    static ref APP_ARGS: AppArgs = make_app_args();
+    static ref APP_ARGS: AppArgs = AppArgs::parse();
     static ref RESUME: Resume = ResumeReader::make();
 }
 
@@ -50,7 +45,14 @@ fn ensure_states() {
 }
 
 fn main() {
+     // Initialize shared logger
+    let lvl_filter = LevelFilter::from_str(&APP_ARGS.log_level).expect("invalid log level");
+    let _logger = ConfigLogger::init(
+        lvl_filter,
+    );
+
     info!("starting up");
     ensure_states();
-    println!("Hello, world!");
+    debug!("Read {:?}", APP_ARGS.resume_config);
+    debug!("Resume Read for: {}", RESUME.name);
 }
