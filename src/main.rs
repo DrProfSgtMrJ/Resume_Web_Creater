@@ -52,5 +52,5 @@ fn main() {
     info!("starting up");
     ensure_states();
     debug!("Read {:?}", APP_ARGS.resume_config);
-    debug!("Resume Read for: {}", RESUME.name);
+    debug!("Resume Read for: {}", RESUME.info.name);
 }
