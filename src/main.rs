@@ -1,35 +1,35 @@
-
 #[macro_use]
 extern crate lazy_static;
 
 #[macro_use]
 extern crate log;
 
-
-mod resume;
-mod reader;
 mod logger;
+mod reader;
+mod resume;
 
-use crate::resume::Resume;
-use crate::reader::ResumeReader;
 use crate::logger::ConfigLogger;
+use crate::reader::ResumeReader;
+use crate::resume::Resume;
 
+use clap::Parser;
+use log::LevelFilter;
 use std::{ops::Deref, str::FromStr};
-use clap::{Parser};
-use log::{LevelFilter};
-
-
 
 #[derive(Parser, Default, Debug)]
-#[clap(author="Jade Dever Matthews", version, about="Generates a web page from a resume")]
+#[clap(
+    author = "Jade Dever Matthews",
+    version,
+    about = "Generates a web page from a resume"
+)]
 struct AppArgs {
     #[clap(short, long)]
-    #[clap(default_value="./resume_example.toml")]
+    #[clap(default_value = "./resume_example.toml")]
     /// Path to the resume config file
     resume_config: String,
 
     #[clap(short, long)]
-    #[clap(default_value="debug")]
+    #[clap(default_value = "debug")]
     /// Level for log: off, error, warn, info, debug, trace
     log_level: String,
 }
@@ -45,11 +45,9 @@ fn ensure_states() {
 }
 
 fn main() {
-     // Initialize shared logger
+    // Initialize shared logger
     let lvl_filter = LevelFilter::from_str(&APP_ARGS.log_level).expect("invalid log level");
-    let _logger = ConfigLogger::init(
-        lvl_filter,
-    );
+    let _logger = ConfigLogger::init(lvl_filter);
 
     info!("starting up");
     ensure_states();
